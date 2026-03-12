@@ -400,7 +400,7 @@ export default function LandingPage() {
                   </svg>
                 </Button>
               </Link>
-              <Link href="/analyze">
+              <Link href="/analyze?tab=preset">
                 <Button variant="secondary" size="lg">{l.ctaPreset}</Button>
               </Link>
             </div>
@@ -557,7 +557,7 @@ export default function LandingPage() {
       <section className="max-w-5xl mx-auto px-5 sm:px-8 pb-32">
         <FadeIn>
           <div
-            className="relative rounded-3xl overflow-hidden border border-bg-border p-12 sm:p-16 text-center"
+            className="relative rounded-3xl overflow-hidden border border-bg-border p-8 sm:p-12 lg:p-16 text-center"
             style={{
               background: "linear-gradient(160deg, #141414 0%, #0d0d0d 100%)",
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06), 0 32px 80px rgba(0,0,0,0.4)",
@@ -568,7 +568,7 @@ export default function LandingPage() {
               style={{ background: "radial-gradient(ellipse, rgba(249,115,22,0.09) 0%, transparent 65%)" }} />
 
             <div className="relative">
-              <h2 className="text-[38px] sm:text-[50px] font-black tracking-[-0.03em] text-ink mb-4 leading-tight">
+              <h2 className="text-[28px] sm:text-[38px] lg:text-[50px] font-black tracking-[-0.03em] text-ink mb-4 leading-tight">
                 {l.ctaSectionTitle}
               </h2>
               <p className="text-[15px] text-ink-secondary mb-10 max-w-sm mx-auto leading-relaxed">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { PortfolioAsset, AnalysisResult, PresetPortfolio } from "@/types";
 import { analyzePortfolio, normalizeWeights } from "@/lib/analysis/engine";
 import { integrateRoasts } from "@/lib/roast/engine";
@@ -71,17 +72,17 @@ function VerdictCard({
         </div>
       </div>
 
-      <div className="relative px-7 sm:px-9 pt-8 pb-7 space-y-7">
+      <div className="relative px-5 sm:px-7 lg:px-9 pt-7 sm:pt-8 pb-6 sm:pb-7 space-y-6 sm:space-y-7">
 
         {/* ── Top: Grade + Personality ───────────────────────── */}
-        <div className="flex items-start gap-6 sm:gap-8">
+        <div className="flex items-start gap-4 sm:gap-6 lg:gap-8">
 
           {/* Grade block */}
           <div className="flex-shrink-0 text-center">
             <div
               className="num font-black leading-none"
               style={{
-                fontSize: "5rem",
+                fontSize: "clamp(3.5rem, 12vw, 5rem)",
                 color: hex,
                 textShadow: `0 0 32px ${hex}66, 0 0 64px ${hex}22`,
                 letterSpacing: "-0.03em",
@@ -181,15 +182,18 @@ function VerdictCard({
   );
 }
 
-export default function AnalyzePage() {
+function AnalyzePageInner() {
   const { t, language } = useLanguage();
   const a = t.analyze;
+  const searchParams = useSearchParams();
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [analyzedAssets, setAnalyzedAssets] = useState<PortfolioAsset[] | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>();
-  const [activeTab, setActiveTab] = useState<"build" | "preset">("build");
+  const [activeTab, setActiveTab] = useState<"build" | "preset">(
+    searchParams.get("tab") === "preset" ? "preset" : "build"
+  );
   const resultsRef = useRef<HTMLDivElement>(null);
 
   // Re-run analysis in the new language whenever user switches language mid-session
@@ -244,8 +248,8 @@ export default function AnalyzePage() {
 
       {/* ── Page header ──────────────────────────────── */}
       <div className="space-y-1.5">
-        <h1 className="text-[32px] font-black tracking-[-0.025em] text-ink">{a.title}</h1>
-        <p className="text-[14px] text-ink-tertiary">{a.subtitle}</p>
+        <h1 className="text-[26px] sm:text-[32px] font-black tracking-[-0.025em] text-ink">{a.title}</h1>
+        <p className="text-[13px] sm:text-[14px] text-ink-tertiary">{a.subtitle}</p>
       </div>
 
       {/* ── Input card ───────────────────────────────── */}
@@ -301,15 +305,15 @@ export default function AnalyzePage() {
         </div>
 
         {/* Footer / Analyze bar */}
-        <div className="px-6 pb-5 border-t border-bg-separator">
-          <div className="flex items-center justify-between gap-4 pt-4">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-bg-separator">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4">
 
             {/* Weight status */}
             <div className="text-[13px] text-ink-tertiary">
               {assets.length === 0 ? (
                 a.noAssets
               ) : (
-                <span className="flex items-center gap-2">
+                <span className="flex items-center flex-wrap gap-x-2 gap-y-1">
                   <span className="num font-semibold text-ink-secondary">{assets.length}</span>
                   <span>{a.assetCount(assets.length)}</span>
                   <span className="text-ink-disabled">·</span>
@@ -338,7 +342,7 @@ export default function AnalyzePage() {
                 onClick={handleAnalyze}
                 disabled={!canAnalyze || isAnalyzing}
                 size="md"
-                className="min-w-36"
+                className="flex-1 sm:flex-none sm:min-w-36"
               >
                 {isAnalyzing ? (
                   <>
@@ -369,5 +373,13 @@ export default function AnalyzePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AnalyzePage() {
+  return (
+    <Suspense>
+      <AnalyzePageInner />
+    </Suspense>
   );
 }

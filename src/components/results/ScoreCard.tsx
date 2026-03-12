@@ -32,21 +32,18 @@ function ScoreGauge({ score, grade }: { score: number; grade: string }) {
   return (
     <div className="flex flex-col items-center gap-4">
       {/* Arc gauge */}
-      <div
-        className="relative flex items-center justify-center"
-        style={{ width: 200, height: 112 }}
-      >
+      <div className="relative flex items-center justify-center w-full max-w-[200px]">
         {/* Glow ring */}
         <div
           className="absolute rounded-full opacity-30"
           style={{
-            width: 160,
-            height: 160,
-            top: -24,
+            width: "80%",
+            paddingBottom: "80%",
+            top: "-12%",
             background: `radial-gradient(circle, ${cfg.glow} 0%, transparent 70%)`,
           }}
         />
-        <svg width="200" height="112" viewBox="0 0 200 112" fill="none">
+        <svg viewBox="0 0 200 112" fill="none" className="w-full h-auto">
           {/* Track */}
           <path
             d="M 20 100 A 80 80 0 0 1 180 100"
@@ -76,24 +73,33 @@ function ScoreGauge({ score, grade }: { score: number; grade: string }) {
               transition: "stroke-dasharray 1.4s cubic-bezier(0.34,1.56,0.64,1)",
             }}
           />
-        </svg>
-        {/* Center content */}
-        <div className="absolute bottom-1 text-center">
-          <div
-            className="num font-black leading-none"
-            style={{
-              fontSize: "3.5rem",
-              color: cfg.color,
-              textShadow: `0 0 20px ${cfg.glow}`,
-              letterSpacing: "-0.02em",
-            }}
+          {/* Center content rendered inside SVG for proper scaling */}
+          <text
+            x="100"
+            y="88"
+            textAnchor="middle"
+            dominantBaseline="auto"
+            fontSize="52"
+            fontWeight="900"
+            fill={cfg.color}
+            fontFamily="var(--font-mono, monospace)"
+            letterSpacing="-1"
+            style={{ filter: `drop-shadow(0 0 8px ${cfg.glow})` }}
           >
             {grade}
-          </div>
-          <div className="num text-[11px] text-ink-tertiary mt-1 tabular-nums">
-            {score}<span className="text-ink-disabled">/100</span>
-          </div>
-        </div>
+          </text>
+          <text
+            x="100"
+            y="108"
+            textAnchor="middle"
+            dominantBaseline="auto"
+            fontSize="11"
+            fill="rgba(163,163,163,0.8)"
+            fontFamily="var(--font-mono, monospace)"
+          >
+            {score}/100
+          </text>
+        </svg>
       </div>
     </div>
   );
@@ -134,11 +140,11 @@ export default function ScoreCard({ result }: ScoreCardProps) {
   const cfg = gradeConfig[grade] ?? gradeConfig["F"];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 items-start">
+    <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] md:grid-cols-[220px_1fr] gap-6 sm:gap-8 items-start">
 
       {/* Left: Grade + label */}
       <div
-        className="flex flex-col items-center gap-4 md:border-r md:border-bg-border md:pb-2"
+        className="flex flex-col items-center gap-4 sm:border-r sm:border-bg-border sm:pb-2"
         style={{ borderColor: "rgba(255,255,255,0.05)" }}
       >
         <ScoreGauge score={score} grade={grade} />

@@ -42,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen bg-bg-base text-slate-200">
+      <body className="min-h-screen bg-bg-base text-slate-200 overflow-x-hidden">
         <LanguageProvider>
           <Header />
           <main>{children}</main>

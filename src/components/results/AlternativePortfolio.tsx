@@ -51,8 +51,8 @@ export default function AlternativePortfolio({ alternative }: AlternativePortfol
               <span className="num text-[13px] font-semibold text-ink">{asset.ticker}</span>
               <span className="text-[12px] text-ink-tertiary ml-2">{asset.name}</span>
             </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="w-20 h-[3px] bg-white/5 rounded-full overflow-hidden">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <div className="hidden sm:block w-20 h-[3px] bg-white/5 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full"
                   style={{

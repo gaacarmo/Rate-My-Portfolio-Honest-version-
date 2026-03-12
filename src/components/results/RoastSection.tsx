@@ -126,7 +126,7 @@ export default function RoastSection({ roasts }: RoastSectionProps) {
               {/* Huge decorative quote mark */}
               <div
                 className="absolute right-3 top-0 font-serif select-none pointer-events-none leading-none"
-                style={{ fontSize: "8rem", color: cfg.quoteMark }}
+                style={{ fontSize: "clamp(4rem, 10vw, 8rem)", color: cfg.quoteMark }}
                 aria-hidden
               >
                 &ldquo;

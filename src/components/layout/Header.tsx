@@ -60,7 +60,7 @@ export default function Header() {
             <button
               onClick={() => setLanguage("en")}
               className={clsx(
-                "px-2.5 py-1 rounded-l-md text-[11px] font-semibold border border-r-0 transition-all",
+                "px-3 py-2 rounded-l-md text-[11px] font-semibold border border-r-0 transition-all min-h-[36px]",
                 language === "en"
                   ? "bg-bg-raised border-bg-border text-ink"
                   : "border-bg-border text-ink-disabled hover:text-ink-tertiary"
@@ -71,7 +71,7 @@ export default function Header() {
             <button
               onClick={() => setLanguage("pt")}
               className={clsx(
-                "px-2.5 py-1 rounded-r-md text-[11px] font-semibold border transition-all",
+                "px-3 py-2 rounded-r-md text-[11px] font-semibold border transition-all min-h-[36px]",
                 language === "pt"
                   ? "bg-bg-raised border-bg-border text-ink"
                   : "border-bg-border text-ink-disabled hover:text-ink-tertiary"
