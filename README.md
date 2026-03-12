@@ -63,7 +63,7 @@ Beyond the score, you get warnings, recommendations, an alternative portfolio su
 **Prerequisites:** Node.js 18+
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/rate-my-portfolio.git
+git clone https://github.com/gaacarmo/rate-my-portfolio.git
 cd rate-my-portfolio
 npm install
 npm run dev
