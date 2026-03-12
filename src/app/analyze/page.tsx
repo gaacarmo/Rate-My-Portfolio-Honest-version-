@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PortfolioAsset, AnalysisResult, PresetPortfolio } from "@/types";
 import { analyzePortfolio, normalizeWeights } from "@/lib/analysis/engine";
 import { integrateRoasts } from "@/lib/roast/engine";
@@ -185,11 +185,20 @@ export default function AnalyzePage() {
   const { t, language } = useLanguage();
   const a = t.analyze;
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
+  const [analyzedAssets, setAnalyzedAssets] = useState<PortfolioAsset[] | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<"build" | "preset">("build");
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Re-run analysis in the new language whenever user switches language mid-session
+  useEffect(() => {
+    if (!analyzedAssets) return;
+    const raw = analyzePortfolio(analyzedAssets, language);
+    const final = integrateRoasts(raw, language);
+    setResult(final);
+  }, [language]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalWeight = assets.reduce((s, a) => s + a.weight, 0);
   const canAnalyze = assets.length >= 1;
@@ -213,6 +222,7 @@ export default function AnalyzePage() {
     setTimeout(() => {
       const raw = analyzePortfolio(normalized, language);
       const final = integrateRoasts(raw, language);
+      setAnalyzedAssets(normalized);
       setResult(final);
       setIsAnalyzing(false);
       setTimeout(() => {
@@ -223,6 +233,7 @@ export default function AnalyzePage() {
 
   function handleReset() {
     setAssets([]);
+    setAnalyzedAssets(null);
     setResult(null);
     setSelectedPreset(undefined);
     window.scrollTo({ top: 0, behavior: "smooth" });
