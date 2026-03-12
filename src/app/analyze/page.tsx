@@ -211,7 +211,7 @@ export default function AnalyzePage() {
     const normalized = Math.abs(totalWeight - 100) > 0.5 ? normalizeWeights(assets) : assets;
 
     setTimeout(() => {
-      const raw = analyzePortfolio(normalized);
+      const raw = analyzePortfolio(normalized, language);
       const final = integrateRoasts(raw, language);
       setResult(final);
       setIsAnalyzing(false);

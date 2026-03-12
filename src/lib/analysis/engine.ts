@@ -7,6 +7,7 @@ import {
   PersonalityType,
   Portfolio,
 } from "@/types";
+import type { Language } from "@/i18n/translations";
 
 const RISK_SCORES: Record<string, number> = {
   very_low: 10,
@@ -131,23 +132,39 @@ function calcCoherenceScore(m: PortfolioMetrics): number {
   return Math.min(100, Math.max(0, score));
 }
 
-function generateWarnings(m: PortfolioMetrics): Warning[] {
+function t<T>(lang: Language, en: T, pt: T): T {
+  return lang === "pt" ? pt : en;
+}
+
+function generateWarnings(m: PortfolioMetrics, lang: Language): Warning[] {
   const warnings: Warning[] = [];
 
   if (m.maxPositionWeight > 50) {
     warnings.push({
       id: "concentration-extreme",
       level: "danger",
-      title: "Extreme Concentration Risk",
-      description: `Your largest position is ${m.maxPositionWeight.toFixed(1)}% of the portfolio. One bad earnings call away from an existential crisis.`,
+      title: t(lang,
+        "Extreme Concentration Risk",
+        "Risco de Concentração Extrema"
+      ),
+      description: t(lang,
+        `Your largest position is ${m.maxPositionWeight.toFixed(1)}% of the portfolio. One bad earnings call away from an existential crisis.`,
+        `Sua maior posição é ${m.maxPositionWeight.toFixed(1)}% da carteira. A um resultado ruim de uma crise existencial.`
+      ),
       metric: `${m.maxPositionWeight.toFixed(1)}% max position`,
     });
   } else if (m.maxPositionWeight > 30) {
     warnings.push({
       id: "concentration-high",
       level: "warning",
-      title: "High Single-Position Weight",
-      description: `Your top position represents ${m.maxPositionWeight.toFixed(1)}% of your portfolio. You have convictions. Hopefully, well-researched ones.`,
+      title: t(lang,
+        "High Single-Position Weight",
+        "Peso Elevado em Posição Única"
+      ),
+      description: t(lang,
+        `Your top position represents ${m.maxPositionWeight.toFixed(1)}% of your portfolio. You have convictions. Hopefully, well-researched ones.`,
+        `Sua maior posição representa ${m.maxPositionWeight.toFixed(1)}% da carteira. Você tem convicções. Esperamos que bem fundamentadas.`
+      ),
       metric: `${m.maxPositionWeight.toFixed(1)}% max position`,
     });
   }
@@ -156,16 +173,28 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
     warnings.push({
       id: "crypto-extreme",
       level: "danger",
-      title: "This Is Primarily a Crypto Bet",
-      description: `${m.cryptoExposure.toFixed(1)}% in crypto. Your risk management strategy appears to be 'vibe-based.' This is a description, not a compliment.`,
+      title: t(lang,
+        "This Is Primarily a Crypto Bet",
+        "Isso É Principalmente uma Aposta em Cripto"
+      ),
+      description: t(lang,
+        `${m.cryptoExposure.toFixed(1)}% in crypto. Your risk management strategy appears to be 'vibe-based.' This is a description, not a compliment.`,
+        `${m.cryptoExposure.toFixed(1)}% em cripto. Sua estratégia de gestão de risco parece ser baseada em 'vibes'. Isso é uma descrição, não um elogio.`
+      ),
       metric: `${m.cryptoExposure.toFixed(1)}% crypto`,
     });
   } else if (m.cryptoExposure > 30) {
     warnings.push({
       id: "crypto-high",
       level: "warning",
-      title: "Significant Crypto Exposure",
-      description: `${m.cryptoExposure.toFixed(1)}% in crypto. Make sure your thesis includes a plan for 'down 80% in 6 months,' because history is data.`,
+      title: t(lang,
+        "Significant Crypto Exposure",
+        "Exposição Significativa a Cripto"
+      ),
+      description: t(lang,
+        `${m.cryptoExposure.toFixed(1)}% in crypto. Make sure your thesis includes a plan for 'down 80% in 6 months,' because history is data.`,
+        `${m.cryptoExposure.toFixed(1)}% em cripto. Certifique-se de que sua tese inclui um plano para 'queda de 80% em 6 meses', porque histórico é dado.`
+      ),
       metric: `${m.cryptoExposure.toFixed(1)}% crypto`,
     });
   }
@@ -174,8 +203,14 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
     warnings.push({
       id: "tech-thematic",
       level: "warning",
-      title: "Thematic Risk: Technology Overweight",
-      description: `${m.techExposure.toFixed(1)}% tech exposure. You're betting on one sector's continued dominance, which has worked... until it hasn't.`,
+      title: t(lang,
+        "Thematic Risk: Technology Overweight",
+        "Risco Temático: Excesso em Tecnologia"
+      ),
+      description: t(lang,
+        `${m.techExposure.toFixed(1)}% tech exposure. You're betting on one sector's continued dominance, which has worked... until it hasn't.`,
+        `${m.techExposure.toFixed(1)}% em tecnologia. Você está apostando na dominância contínua de um setor, o que funcionou... até não funcionar.`
+      ),
       metric: `${m.techExposure.toFixed(1)}% tech`,
     });
   }
@@ -184,9 +219,15 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
     warnings.push({
       id: "home-bias",
       level: "warning",
-      title: "Geographic Concentration (Home Bias)",
-      description: "All equity exposure is in one country. The world has more than one economy, which is worth acknowledging in your asset allocation.",
-      metric: "Single geography",
+      title: t(lang,
+        "Geographic Concentration (Home Bias)",
+        "Concentração Geográfica (Viés Doméstico)"
+      ),
+      description: t(lang,
+        "All equity exposure is in one country. The world has more than one economy, which is worth acknowledging in your asset allocation.",
+        "Toda a exposição em renda variável está em um único país. O mundo tem mais de uma economia, o que vale a pena reconhecer na sua alocação."
+      ),
+      metric: t(lang, "Single geography", "Uma única geografia"),
     });
   }
 
@@ -194,9 +235,15 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
     warnings.push({
       id: "overdiversified",
       level: "info",
-      title: "Possible Over-Diversification",
-      description: `${m.assetCount} positions. At this scale, you're likely paying fees to track an index less efficiently than just buying the index.`,
-      metric: `${m.assetCount} assets`,
+      title: t(lang,
+        "Possible Over-Diversification",
+        "Possível Excesso de Diversificação"
+      ),
+      description: t(lang,
+        `${m.assetCount} positions. At this scale, you're likely paying fees to track an index less efficiently than just buying the index.`,
+        `${m.assetCount} posições. Nessa escala, você provavelmente paga taxas para replicar um índice de forma menos eficiente do que simplesmente comprando o índice.`
+      ),
+      metric: `${m.assetCount} ${t(lang, "assets", "ativos")}`,
     });
   }
 
@@ -204,9 +251,15 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
     warnings.push({
       id: "no-fixed-income",
       level: "info",
-      title: "Zero Fixed Income Allocation",
-      description: "No bonds or fixed income. Either you have a very long time horizon, very high risk tolerance, or haven't gotten to that chapter yet.",
-      metric: "0% bonds/fixed income",
+      title: t(lang,
+        "Zero Fixed Income Allocation",
+        "Zero de Renda Fixa na Carteira"
+      ),
+      description: t(lang,
+        "No bonds or fixed income. Either you have a very long time horizon, very high risk tolerance, or haven't gotten to that chapter yet.",
+        "Sem títulos ou renda fixa. Ou você tem um horizonte muito longo, tolerância ao risco muito alta, ou ainda não chegou nesse capítulo."
+      ),
+      metric: t(lang, "0% bonds/fixed income", "0% títulos/renda fixa"),
     });
   }
 
@@ -214,8 +267,14 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
     warnings.push({
       id: "hhi-extreme",
       level: "danger",
-      title: "Portfolio Resembles a Single Bet",
-      description: `Effective diversification equivalent to ~${m.effectiveN.toFixed(1)} distinct positions. Concentration this extreme requires either exceptional research or exceptional luck.`,
+      title: t(lang,
+        "Portfolio Resembles a Single Bet",
+        "Carteira Se Assemelha a Uma Aposta Única"
+      ),
+      description: t(lang,
+        `Effective diversification equivalent to ~${m.effectiveN.toFixed(1)} distinct positions. Concentration this extreme requires either exceptional research or exceptional luck.`,
+        `Diversificação efetiva equivalente a ~${m.effectiveN.toFixed(1)} posições distintas. Concentração tão extrema exige pesquisa excepcional ou sorte excepcional.`
+      ),
       metric: `HHI: ${m.hhi.toFixed(2)}`,
     });
   }
@@ -224,9 +283,12 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
     warnings.push({
       id: "mixed-signals",
       level: "warning",
-      title: "Mixed Risk Signals",
-      description: "Holding significant crypto and bonds simultaneously suggests either sophisticated hedging or contradictory risk preferences. Only you know which.",
-      metric: `${m.cryptoExposure.toFixed(0)}% crypto + ${m.bondExposure.toFixed(0)}% bonds`,
+      title: t(lang, "Mixed Risk Signals", "Sinais de Risco Contraditórios"),
+      description: t(lang,
+        "Holding significant crypto and bonds simultaneously suggests either sophisticated hedging or contradictory risk preferences. Only you know which.",
+        "Ter cripto e renda fixa simultaneamente sugere hedge sofisticado ou preferências de risco contraditórias. Só você sabe qual dos dois."
+      ),
+      metric: `${m.cryptoExposure.toFixed(0)}% crypto + ${m.bondExposure.toFixed(0)}% ${t(lang, "bonds", "renda fixa")}`,
     });
   }
 
@@ -235,7 +297,8 @@ function generateWarnings(m: PortfolioMetrics): Warning[] {
 
 function generateRecommendations(
   m: PortfolioMetrics,
-  scores: { diversification: number; concentration: number; risk: number; coherence: number }
+  scores: { diversification: number; concentration: number; risk: number; coherence: number },
+  lang: Language
 ): Recommendation[] {
   const recs: Recommendation[] = [];
 
@@ -243,9 +306,18 @@ function generateRecommendations(
     recs.push({
       id: "reduce-concentration",
       priority: "high",
-      title: "Reduce Position Concentration",
-      description: "Your portfolio is heavily concentrated, amplifying company-specific risk beyond what diversification should allow.",
-      actionable: "Cap individual stock positions at 5–10% of the total portfolio. Use broad ETFs (SPY, VTI) for core exposure and keep single-stock picks as satellite positions.",
+      title: t(lang,
+        "Reduce Position Concentration",
+        "Reduzir Concentração de Posições"
+      ),
+      description: t(lang,
+        "Your portfolio is heavily concentrated, amplifying company-specific risk beyond what diversification should allow.",
+        "Sua carteira está altamente concentrada, amplificando o risco específico de empresa além do que a diversificação deveria permitir."
+      ),
+      actionable: t(lang,
+        "Cap individual stock positions at 5–10% of the total portfolio. Use broad ETFs (SPY, VTI) for core exposure and keep single-stock picks as satellite positions.",
+        "Limite posições individuais a 5–10% da carteira total. Use ETFs amplos (SPY, VTI) para exposição central e mantenha ações individuais como posições satélite."
+      ),
     });
   }
 
@@ -253,9 +325,15 @@ function generateRecommendations(
     recs.push({
       id: "rebalance-crypto",
       priority: m.cryptoExposure > 40 ? "high" : "medium",
-      title: "Review Crypto Allocation",
-      description: `${m.cryptoExposure.toFixed(0)}% in crypto creates outsized portfolio volatility and tail risk relative to traditional assets.`,
-      actionable: "Most evidence-based frameworks suggest limiting speculative assets (including crypto) to 5–15% of holdings. Rebalancing doesn't mean abandoning the thesis — it means sizing it appropriately.",
+      title: t(lang, "Review Crypto Allocation", "Revisar Alocação em Cripto"),
+      description: t(lang,
+        `${m.cryptoExposure.toFixed(0)}% in crypto creates outsized portfolio volatility and tail risk relative to traditional assets.`,
+        `${m.cryptoExposure.toFixed(0)}% em cripto gera volatilidade desproporcional e risco de cauda em relação a ativos tradicionais.`
+      ),
+      actionable: t(lang,
+        "Most evidence-based frameworks suggest limiting speculative assets (including crypto) to 5–15% of holdings. Rebalancing doesn't mean abandoning the thesis — it means sizing it appropriately.",
+        "A maioria dos frameworks baseados em evidências sugere limitar ativos especulativos (incluindo cripto) a 5–15% da carteira. Rebalancear não significa abandonar a tese — significa dimensioná-la corretamente."
+      ),
     });
   }
 
@@ -263,9 +341,18 @@ function generateRecommendations(
     recs.push({
       id: "add-fixed-income",
       priority: "medium",
-      title: "Consider Adding Fixed Income",
-      description: "A complete absence of bonds or fixed income reduces portfolio resilience during equity market downturns.",
-      actionable: "Even a 10–20% allocation to investment-grade bonds (BND, AGG) or Treasuries (TLT) can meaningfully reduce maximum drawdown with limited long-term return impact.",
+      title: t(lang,
+        "Consider Adding Fixed Income",
+        "Considere Adicionar Renda Fixa"
+      ),
+      description: t(lang,
+        "A complete absence of bonds or fixed income reduces portfolio resilience during equity market downturns.",
+        "A ausência total de títulos ou renda fixa reduz a resiliência da carteira durante quedas no mercado de renda variável."
+      ),
+      actionable: t(lang,
+        "Even a 10–20% allocation to investment-grade bonds (BND, AGG) or Treasuries (TLT) can meaningfully reduce maximum drawdown with limited long-term return impact.",
+        "Mesmo uma alocação de 10–20% em títulos de grau de investimento (BND, AGG) ou Tesouro (TLT) pode reduzir significativamente o drawdown máximo com impacto limitado no retorno de longo prazo."
+      ),
     });
   }
 
@@ -273,9 +360,18 @@ function generateRecommendations(
     recs.push({
       id: "add-international",
       priority: "medium",
-      title: "Add International Diversification",
-      description: "Single-country equity exposure concentrates political, currency, and economic cycle risks in one market.",
-      actionable: "Allocate 20–30% of equity exposure to international developed markets (VEA, EFA) and 5–15% to emerging markets (VWO, EEM) for genuine geographic diversification.",
+      title: t(lang,
+        "Add International Diversification",
+        "Adicionar Diversificação Internacional"
+      ),
+      description: t(lang,
+        "Single-country equity exposure concentrates political, currency, and economic cycle risks in one market.",
+        "Exposição em renda variável de um único país concentra riscos políticos, cambiais e de ciclo econômico em um único mercado."
+      ),
+      actionable: t(lang,
+        "Allocate 20–30% of equity exposure to international developed markets (VEA, EFA) and 5–15% to emerging markets (VWO, EEM) for genuine geographic diversification.",
+        "Aloque 20–30% da exposição em ações para mercados desenvolvidos internacionais (VEA, EFA) e 5–15% para mercados emergentes (VWO, EEM) para diversificação geográfica real."
+      ),
     });
   }
 
@@ -283,9 +379,15 @@ function generateRecommendations(
     recs.push({
       id: "broaden-holdings",
       priority: "high",
-      title: "Broaden Your Holdings",
-      description: "Very few positions leave the portfolio entirely exposed to idiosyncratic events in a handful of assets.",
-      actionable: "Consider building to 10–15 positions across at least 2–3 asset classes, or use a single broad index ETF (VTI, SPY) to gain instant diversification.",
+      title: t(lang, "Broaden Your Holdings", "Amplie Seus Ativos"),
+      description: t(lang,
+        "Very few positions leave the portfolio entirely exposed to idiosyncratic events in a handful of assets.",
+        "Poucas posições deixam a carteira totalmente exposta a eventos idiossincráticos em poucos ativos."
+      ),
+      actionable: t(lang,
+        "Consider building to 10–15 positions across at least 2–3 asset classes, or use a single broad index ETF (VTI, SPY) to gain instant diversification.",
+        "Considere expandir para 10–15 posições em pelo menos 2–3 classes de ativos, ou use um único ETF de índice amplo (VTI, SPY) para obter diversificação instantânea."
+      ),
     });
   }
 
@@ -293,106 +395,166 @@ function generateRecommendations(
     recs.push({
       id: "add-defensive-anchor",
       priority: "medium",
-      title: "Add Defensive Anchors",
-      description: "Your portfolio's overall risk level is very high. Defensive assets can improve risk-adjusted returns over full market cycles.",
-      actionable: "Allocate 15–25% to defensive assets — gold (GLD), bonds (BND), or dividend-focused ETFs — to act as a volatility buffer during market stress.",
+      title: t(lang, "Add Defensive Anchors", "Adicionar Âncoras Defensivas"),
+      description: t(lang,
+        "Your portfolio's overall risk level is very high. Defensive assets can improve risk-adjusted returns over full market cycles.",
+        "O nível de risco geral da sua carteira é muito alto. Ativos defensivos podem melhorar os retornos ajustados ao risco ao longo de ciclos completos de mercado."
+      ),
+      actionable: t(lang,
+        "Allocate 15–25% to defensive assets — gold (GLD), bonds (BND), or dividend-focused ETFs — to act as a volatility buffer during market stress.",
+        "Aloque 15–25% em ativos defensivos — ouro (GLD), títulos (BND) ou ETFs focados em dividendos — para funcionar como amortecedor de volatilidade em momentos de estresse."
+      ),
     });
   }
 
   return recs;
 }
 
-function determinePersonality(m: PortfolioMetrics, score: number): PersonalityType {
+function determinePersonality(m: PortfolioMetrics, score: number, lang: Language): PersonalityType {
   if (m.cryptoExposure > 65) {
     return {
       key: "crypto_evangelist",
-      name: "The Crypto Evangelist",
+      name: t(lang, "The Crypto Evangelist", "O Evangelista Cripto"),
       icon: "Moon",
-      description: "You believe traditional finance is broken. You're proving it by breaking your own finances faster. Commitment to the cause is admirable.",
-      tagline: "WAGMI. (Statistically unlikely, but fine.)",
+      description: t(lang,
+        "You believe traditional finance is broken. You're proving it by breaking your own finances faster. Commitment to the cause is admirable.",
+        "Você acredita que o sistema financeiro tradicional está quebrado. Está provando isso quebrando suas próprias finanças mais rápido. O compromisso com a causa é admirável."
+      ),
+      tagline: t(lang,
+        "WAGMI. (Statistically unlikely, but fine.)",
+        "WAGMI. (Estatisticamente improvável, mas tudo bem.)"
+      ),
     };
   }
 
   if (m.hhi > 0.45 && m.weightedRiskScore > 75) {
     return {
       key: "fomo_surfer",
-      name: "The FOMO Surfer",
+      name: t(lang, "The FOMO Surfer", "O Surfista do FOMO"),
       icon: "Waves",
-      description: "Your portfolio is a real-time record of whatever was trending the last time you opened your brokerage app. You call this 'being opportunistic.' We call it something else.",
-      tagline: "Buy high. Panic sell. Repeat.",
+      description: t(lang,
+        "Your portfolio is a real-time record of whatever was trending the last time you opened your brokerage app. You call this 'being opportunistic.' We call it something else.",
+        "Sua carteira é um registro em tempo real do que estava em alta da última vez que você abriu o app. Você chama isso de 'ser oportunista'. Nós chamamos de outra coisa."
+      ),
+      tagline: t(lang,
+        "Buy high. Panic sell. Repeat.",
+        "Compra no topo. Vende em pânico. Repete."
+      ),
     };
   }
 
   if (m.techExposure > 65) {
     return {
       key: "tech_true_believer",
-      name: "The Tech True Believer",
+      name: t(lang, "The Tech True Believer", "O Verdadeiro Crente em Tech"),
       icon: "Laptop",
-      description: "You're not investing in companies. You're investing in the future — specifically, the future where software eats the world and your NVDA position justifies your personality.",
-      tagline: "Disrupting the concept of diversification.",
+      description: t(lang,
+        "You're not investing in companies. You're investing in the future — specifically, the future where software eats the world and your NVDA position justifies your personality.",
+        "Você não investe em empresas. Você investe no futuro — especificamente, o futuro onde o software domina o mundo e sua posição em NVDA justifica sua personalidade."
+      ),
+      tagline: t(lang,
+        "Disrupting the concept of diversification.",
+        "Disruptando o conceito de diversificação."
+      ),
     };
   }
 
   if (m.bondExposure > 50 || (m.byRiskLevel["very_low"] || 0) + (m.byRiskLevel["low"] || 0) > 60) {
     return {
       key: "overcautious_hibernator",
-      name: "The Overcautious Hibernator",
+      name: t(lang, "The Overcautious Hibernator", "O Hibernador Hipercautioso"),
       icon: "Shield",
-      description: "Safety is a virtue. So is beating inflation. Your portfolio is very good at one of these two things.",
-      tagline: "Capital preservation above all. Including real returns.",
+      description: t(lang,
+        "Safety is a virtue. So is beating inflation. Your portfolio is very good at one of these two things.",
+        "Segurança é uma virtude. Bater a inflação também. Sua carteira é muito boa em uma dessas duas coisas."
+      ),
+      tagline: t(lang,
+        "Capital preservation above all. Including real returns.",
+        "Preservação de capital acima de tudo. Inclusive dos retornos reais."
+      ),
     };
   }
 
   if (m.bondExposure + (m.byAssetClass["reit"] || 0) > 30 && m.weightedRiskScore < 40) {
     return {
       key: "dividend_collector",
-      name: "The Dividend Collector",
+      name: t(lang, "The Dividend Collector", "O Colecionador de Dividendos"),
       icon: "Inbox",
-      description: "You don't need growth. You need quarterly deposits and the ability to mention passive income at every social gathering. You have found your calling.",
-      tagline: "Compounding wisdom. At 2.3% yield.",
+      description: t(lang,
+        "You don't need growth. You need quarterly deposits and the ability to mention passive income at every social gathering. You have found your calling.",
+        "Você não precisa de crescimento. Você precisa de depósitos trimestrais e da capacidade de mencionar renda passiva em todo encontro social. Você encontrou sua vocação."
+      ),
+      tagline: t(lang,
+        "Compounding wisdom. At 2.3% yield.",
+        "Juros compostos de sabedoria. A 2,3% de yield."
+      ),
     };
   }
 
   if (score >= 78) {
     return {
       key: "surprisingly_responsible",
-      name: "The Surprisingly Responsible Adult",
+      name: t(lang, "The Surprisingly Responsible Adult", "O Adulto Surpreendentemente Responsável"),
       icon: "Target",
-      description: "Against all odds, you have constructed a portfolio that is diversified, risk-aware, and defensible at a dinner party. This is not common. Your future self will acknowledge this.",
-      tagline: "Doing the boring thing. Correctly.",
+      description: t(lang,
+        "Against all odds, you have constructed a portfolio that is diversified, risk-aware, and defensible at a dinner party. This is not common. Your future self will acknowledge this.",
+        "Contra todas as probabilidades, você construiu uma carteira diversificada, consciente dos riscos e defensável num jantar. Isso não é comum. Seu eu futuro vai reconhecer isso."
+      ),
+      tagline: t(lang,
+        "Doing the boring thing. Correctly.",
+        "Fazendo a coisa chata. Corretamente."
+      ),
     };
   }
 
   if (m.assetCount <= 4 && m.assetClassCount <= 2 && m.weightedRiskScore < 55) {
     return {
       key: "index_fundamentalist",
-      name: "The Index Fundamentalist",
+      name: t(lang, "The Index Fundamentalist", "O Fundamentalista de Índices"),
       icon: "TrendingUp",
-      description: "You've read about efficient markets and taken it extremely literally. Three ETFs. No individual names. No fun. Statistically defensible. Possibly correct.",
-      tagline: "If you can't beat the market, at least be the market.",
+      description: t(lang,
+        "You've read about efficient markets and taken it extremely literally. Three ETFs. No individual names. No fun. Statistically defensible. Possibly correct.",
+        "Você leu sobre mercados eficientes e levou ao pé da letra. Três ETFs. Nenhum nome individual. Sem diversão. Estatisticamente defensável. Possivelmente correto."
+      ),
+      tagline: t(lang,
+        "If you can't beat the market, at least be the market.",
+        "Se não pode bater o mercado, pelo menos seja o mercado."
+      ),
     };
   }
 
   if (m.assetCount > 15) {
     return {
       key: "chaos_agent",
-      name: "The Chaos Agent",
+      name: t(lang, "The Chaos Agent", "O Agente do Caos"),
       icon: "Dices",
-      description: "Diversified? Yes. Intentionally? Unclear. You own a piece of everything and understand none of it, which is actually a coherent strategy if you're comfortable with that description.",
-      tagline: "Throwing darts at the entire global market.",
+      description: t(lang,
+        "Diversified? Yes. Intentionally? Unclear. You own a piece of everything and understand none of it, which is actually a coherent strategy if you're comfortable with that description.",
+        "Diversificado? Sim. Intencionalmente? Não está claro. Você tem um pedaço de tudo e não entende nada, o que é uma estratégia coerente se você estiver confortável com essa descrição."
+      ),
+      tagline: t(lang,
+        "Throwing darts at the entire global market.",
+        "Jogando dardos em todo o mercado global."
+      ),
     };
   }
 
   return {
     key: "confused_optimist",
-    name: "The Confused Optimist",
+    name: t(lang, "The Confused Optimist", "O Otimista Confuso"),
     icon: "CircleHelp",
-    description: "Your portfolio tells the story of someone who has done some research, acted on some of it, ignored some of it, and is still figuring out the rest. This is, frankly, most people.",
-    tagline: "A work in progress. Aren't we all.",
+    description: t(lang,
+      "Your portfolio tells the story of someone who has done some research, acted on some of it, ignored some of it, and is still figuring out the rest. This is, frankly, most people.",
+      "Sua carteira conta a história de alguém que fez alguma pesquisa, agiu em parte dela, ignorou outra parte, e ainda está descobrindo o resto. Isso é, honestamente, a maioria das pessoas."
+    ),
+    tagline: t(lang,
+      "A work in progress. Aren't we all.",
+      "Em construção. Como todos nós."
+    ),
   };
 }
 
-function generateAlternative(m: PortfolioMetrics): Portfolio {
+function generateAlternative(m: PortfolioMetrics, lang: Language): Portfolio {
   const isHighRisk = m.weightedRiskScore > 60;
 
   const assets: PortfolioAsset[] = isHighRisk
@@ -413,13 +575,16 @@ function generateAlternative(m: PortfolioMetrics): Portfolio {
 
   return {
     id: "alternative",
-    name: "A More Defensible Alternative",
+    name: t(lang, "A More Defensible Alternative", "Uma Alternativa Mais Defensável"),
     assets,
-    description: "A globally diversified, low-cost, multi-asset portfolio matching your approximate risk profile.",
+    description: t(lang,
+      "A globally diversified, low-cost, multi-asset portfolio matching your approximate risk profile.",
+      "Uma carteira globalmente diversificada, de baixo custo e multi-ativo, compatível com seu perfil de risco aproximado."
+    ),
   };
 }
 
-export function analyzePortfolio(assets: PortfolioAsset[]): AnalysisResult {
+export function analyzePortfolio(assets: PortfolioAsset[], lang: Language = "en"): AnalysisResult {
   const metrics = calculateMetrics(assets);
 
   const diversificationScore = Math.round(calcDiversificationScore(metrics));
@@ -442,15 +607,15 @@ export function analyzePortfolio(assets: PortfolioAsset[]): AnalysisResult {
   else if (score >= 50) grade = "D";
   else grade = "F";
 
-  const warnings = generateWarnings(metrics);
+  const warnings = generateWarnings(metrics, lang);
   const recommendations = generateRecommendations(metrics, {
     diversification: diversificationScore,
     concentration: concentrationScore,
     risk: riskScore,
     coherence: coherenceScore,
-  });
-  const personality = determinePersonality(metrics, score);
-  const alternativePortfolio = generateAlternative(metrics);
+  }, lang);
+  const personality = determinePersonality(metrics, score, lang);
+  const alternativePortfolio = generateAlternative(metrics, lang);
 
   return {
     score,
