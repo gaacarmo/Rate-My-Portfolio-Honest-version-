@@ -1,0 +1,78 @@
+import { PresetPortfolio } from "@/types";
+
+export const PRESET_PORTFOLIOS: PresetPortfolio[] = [
+  {
+    key: "tech_bro",
+    name: "Tech Bro Portfolio",
+    icon: "Cpu",
+    description: "Silicon Valley approved. Net worth is basically NVDA options.",
+    tagline: "Move fast. Break diversification.",
+    assets: [
+      { ticker: "NVDA", name: "NVIDIA Corp.", weight: 25, assetClass: "stock", sector: "tech", geography: "us", riskLevel: "high" },
+      { ticker: "TSLA", name: "Tesla Inc.", weight: 20, assetClass: "stock", sector: "tech", geography: "us", riskLevel: "high" },
+      { ticker: "AAPL", name: "Apple Inc.", weight: 20, assetClass: "stock", sector: "tech", geography: "us", riskLevel: "medium" },
+      { ticker: "META", name: "Meta Platforms", weight: 15, assetClass: "stock", sector: "tech", geography: "us", riskLevel: "medium" },
+      { ticker: "ARKK", name: "ARK Innovation ETF", weight: 10, assetClass: "etf", sector: "tech", geography: "us", riskLevel: "extreme" },
+      { ticker: "AMD", name: "Advanced Micro Devices", weight: 10, assetClass: "stock", sector: "tech", geography: "us", riskLevel: "high" },
+    ],
+  },
+  {
+    key: "crypto_chaos",
+    name: "Crypto Chaos",
+    icon: "Zap",
+    description: "Traditional finance is broken. Numbers go up, then down, then way down.",
+    tagline: "When the moon? Soon.",
+    assets: [
+      { ticker: "BTC", name: "Bitcoin", weight: 40, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+      { ticker: "ETH", name: "Ethereum", weight: 25, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+      { ticker: "SOL", name: "Solana", weight: 15, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+      { ticker: "DOGE", name: "Dogecoin", weight: 10, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+      { ticker: "SHIB", name: "Shiba Inu", weight: 5, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+      { ticker: "ADA", name: "Cardano", weight: 5, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+    ],
+  },
+  {
+    key: "dividend_dad",
+    name: "Dividend Dad",
+    icon: "BarChart2",
+    description: "Sleep well. Collect dividends. Explain what dividends are to everyone.",
+    tagline: "Passive income. Aggressively boring.",
+    assets: [
+      { ticker: "JNJ", name: "Johnson & Johnson", weight: 20, assetClass: "stock", sector: "healthcare", geography: "us", riskLevel: "low" },
+      { ticker: "KO", name: "Coca-Cola Co.", weight: 20, assetClass: "stock", sector: "consumer", geography: "us", riskLevel: "very_low" },
+      { ticker: "PG", name: "Procter & Gamble", weight: 15, assetClass: "stock", sector: "consumer", geography: "us", riskLevel: "low" },
+      { ticker: "VNQ", name: "Vanguard Real Estate ETF", weight: 15, assetClass: "reit", geography: "us", riskLevel: "medium" },
+      { ticker: "MCD", name: "McDonald's Corp.", weight: 15, assetClass: "stock", sector: "consumer", geography: "us", riskLevel: "low" },
+      { ticker: "JPM", name: "JPMorgan Chase", weight: 15, assetClass: "stock", sector: "finance", geography: "us", riskLevel: "medium" },
+    ],
+  },
+  {
+    key: "tiktok_investor",
+    name: "TikTok Investor",
+    icon: "Smartphone",
+    description: "Investment thesis: a 30-second video with a trending sound.",
+    tagline: "Due diligence is for boomers.",
+    assets: [
+      { ticker: "TSLA", name: "Tesla Inc.", weight: 30, assetClass: "stock", sector: "tech", geography: "us", riskLevel: "high" },
+      { ticker: "DOGE", name: "Dogecoin", weight: 25, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+      { ticker: "SHIB", name: "Shiba Inu", weight: 15, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+      { ticker: "ARKK", name: "ARK Innovation ETF", weight: 15, assetClass: "etf", sector: "tech", geography: "us", riskLevel: "extreme" },
+      { ticker: "MGLU3", name: "Magazine Luiza", weight: 15, assetClass: "stock", sector: "consumer", geography: "brazil", riskLevel: "extreme" },
+    ],
+  },
+  {
+    key: "surprisingly_responsible",
+    name: "Surprisingly Responsible",
+    icon: "Target",
+    description: "Boring? Maybe. Diversified? Yes. Slightly smug about it? Absolutely.",
+    tagline: "Evidence-based. Mildly condescending.",
+    assets: [
+      { ticker: "VTI", name: "Vanguard Total Market ETF", weight: 40, assetClass: "etf", sector: "diversified", geography: "us", riskLevel: "medium" },
+      { ticker: "VEA", name: "Vanguard Dev. Markets ETF", weight: 25, assetClass: "etf", sector: "diversified", geography: "global", riskLevel: "medium" },
+      { ticker: "BND", name: "Vanguard Total Bond Market ETF", weight: 15, assetClass: "bond", geography: "us", riskLevel: "low" },
+      { ticker: "VWO", name: "Vanguard Emerging Markets ETF", weight: 10, assetClass: "etf", sector: "diversified", geography: "emerging", riskLevel: "high" },
+      { ticker: "GLD", name: "SPDR Gold Shares", weight: 5, assetClass: "commodity", geography: "global", riskLevel: "medium" },
+      { ticker: "BTC", name: "Bitcoin", weight: 5, assetClass: "crypto", geography: "global", riskLevel: "extreme" },
+    ],
+  },
+];

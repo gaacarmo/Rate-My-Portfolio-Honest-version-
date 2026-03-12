@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ratemyportfolio.app/sitemap.xml
