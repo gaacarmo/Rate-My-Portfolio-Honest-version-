@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ratemyportfolio.app";
+import { SITE_URL as siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   description:
     "Analyze your investment portfolio. Get real metrics, actual insights, and unsolicited honesty about your financial decisions.",
   keywords: ["portfolio analysis", "investment", "diversification", "roast", "finance", "HHI", "portfolio score"],
-  authors: [{ name: "Rate My Portfolio" }],
+  authors: [{ name: "Gabriel Carmo", url: "https://gabrielcarmo.com" }],
+  creator: "Gabriel Carmo",
   openGraph: {
     title: "Rate My Portfolio — Honest Mode",
     description: "Get a brutally honest analysis of your investment portfolio. Real metrics, real roasts.",
@@ -33,6 +34,11 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

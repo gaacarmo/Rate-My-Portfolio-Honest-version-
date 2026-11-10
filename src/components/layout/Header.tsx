@@ -59,6 +59,8 @@ export default function Header() {
           <div className="flex items-center">
             <button
               onClick={() => setLanguage("en")}
+              aria-pressed={language === "en"}
+              aria-label="English"
               className={clsx(
                 "px-3 py-2 rounded-l-md text-[11px] font-semibold border border-r-0 transition-all min-h-[36px]",
                 language === "en"
@@ -70,6 +72,8 @@ export default function Header() {
             </button>
             <button
               onClick={() => setLanguage("pt")}
+              aria-pressed={language === "pt"}
+              aria-label="Português"
               className={clsx(
                 "px-3 py-2 rounded-r-md text-[11px] font-semibold border transition-all min-h-[36px]",
                 language === "pt"

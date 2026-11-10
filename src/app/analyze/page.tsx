@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, Suspense } from "react";
+import { useState, useRef, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { PortfolioAsset, AnalysisResult, PresetPortfolio } from "@/types";
 import { analyzePortfolio, normalizeWeights } from "@/lib/analysis/engine";
@@ -188,7 +188,6 @@ function AnalyzePageInner() {
   const searchParams = useSearchParams();
   const [assets, setAssets] = useState<PortfolioAsset[]>([]);
   const [analyzedAssets, setAnalyzedAssets] = useState<PortfolioAsset[] | null>(null);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<"build" | "preset">(
@@ -196,16 +195,14 @@ function AnalyzePageInner() {
   );
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Re-run analysis in the new language whenever user switches language mid-session
-  useEffect(() => {
-    if (!analyzedAssets) return;
-    const raw = analyzePortfolio(analyzedAssets, language);
-    const final = integrateRoasts(raw, language);
-    setResult(final);
-  }, [language]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Derived from the analyzed snapshot, so switching language re-renders the verdict in place.
+  const result = useMemo<AnalysisResult | null>(() => {
+    if (!analyzedAssets) return null;
+    return integrateRoasts(analyzePortfolio(analyzedAssets, language), language);
+  }, [analyzedAssets, language]);
 
   const totalWeight = assets.reduce((s, a) => s + a.weight, 0);
-  const canAnalyze = assets.length >= 1;
+  const canAnalyze = assets.some((a) => a.weight > 0);
 
   function handlePresetSelect(preset: PresetPortfolio) {
     const presetAssets: PortfolioAsset[] = preset.assets.map((a) => ({
@@ -214,20 +211,20 @@ function AnalyzePageInner() {
     }));
     setAssets(presetAssets);
     setSelectedPreset(preset.key);
-    setResult(null);
+    setAnalyzedAssets(null);
     setActiveTab("build");
   }
 
   function handleAnalyze() {
     if (!canAnalyze) return;
     setIsAnalyzing(true);
-    const normalized = Math.abs(totalWeight - 100) > 0.5 ? normalizeWeights(assets) : assets;
+    // Zero-weight rows are placeholders, not holdings — don't let them inflate diversification.
+    const held = assets.filter((a) => a.weight > 0);
+    const heldTotal = held.reduce((s, a) => s + a.weight, 0);
+    const normalized = Math.abs(heldTotal - 100) > 0.5 ? normalizeWeights(held) : held;
 
     setTimeout(() => {
-      const raw = analyzePortfolio(normalized, language);
-      const final = integrateRoasts(raw, language);
       setAnalyzedAssets(normalized);
-      setResult(final);
       setIsAnalyzing(false);
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -238,7 +235,6 @@ function AnalyzePageInner() {
   function handleReset() {
     setAssets([]);
     setAnalyzedAssets(null);
-    setResult(null);
     setSelectedPreset(undefined);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -256,11 +252,13 @@ function AnalyzePageInner() {
       <div className="rounded-xl border border-bg-border bg-bg-surface overflow-hidden">
 
         {/* Tabs */}
-        <div className="flex border-b border-bg-border">
+        <div className="flex border-b border-bg-border" role="tablist">
           {(["build", "preset"] as const).map((tab) => (
             <button
               key={tab}
               type="button"
+              role="tab"
+              aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
               className={clsx(
                 "flex-1 px-6 py-3.5 text-[13px] font-semibold transition-colors duration-150",
@@ -277,7 +275,11 @@ function AnalyzePageInner() {
         {/* Tab content */}
         <div className="p-6">
           {activeTab === "build" ? (
-            <PortfolioBuilder assets={assets} onChange={setAssets} />
+            <PortfolioBuilder
+              assets={assets}
+              onChange={setAssets}
+              onBrowsePresets={() => setActiveTab("preset")}
+            />
           ) : (
             <div className="space-y-5">
               <p className="text-[13px] text-ink-tertiary leading-relaxed">
@@ -369,7 +371,7 @@ function AnalyzePageInner() {
           <VerdictCard result={result} onReset={handleReset} />
 
           {/* Full analysis */}
-          <AnalysisResults result={result} assets={assets} />
+          <AnalysisResults result={result} assets={analyzedAssets ?? assets} />
         </div>
       )}
     </div>

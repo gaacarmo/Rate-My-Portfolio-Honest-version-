@@ -12,6 +12,16 @@ const PALETTE = [
   "#E879F9", "#A3E635", "#38BDF8", "#FBBF24", "#6EE7B7",
 ];
 
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number }> }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-bg-raised border border-bg-border rounded-lg px-3 py-2 shadow-xl">
+      <div className="text-[12px] text-ink-secondary">{payload[0].name}</div>
+      <div className="num text-[18px] font-bold text-ink">{payload[0].value.toFixed(1)}%</div>
+    </div>
+  );
+}
+
 type View = "asset" | "class" | "geography";
 
 interface AllocationChartProps {
@@ -43,15 +53,6 @@ export default function AllocationChart({ assets, metrics }: AllocationChartProp
     class: ch.byClass, asset: ch.byAsset, geography: ch.byRegion,
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload?.length) return null;
-    return (
-      <div className="bg-bg-raised border border-bg-border rounded-lg px-3 py-2 shadow-xl">
-        <div className="text-[12px] text-ink-secondary">{payload[0].name}</div>
-        <div className="num text-[18px] font-bold text-ink">{payload[0].value.toFixed(1)}%</div>
-      </div>
-    );
-  };
 
   return (
     <div className="space-y-5">

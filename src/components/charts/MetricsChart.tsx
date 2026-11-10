@@ -6,6 +6,16 @@ import {
 import { AnalysisResult } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ value: number; payload: { metric: string } }> }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-bg-raised border border-bg-border rounded-lg px-3 py-2 shadow-xl">
+      <div className="text-[11px] text-ink-tertiary">{payload[0].payload.metric}</div>
+      <div className="num text-[18px] font-bold text-brand">{payload[0].value} / 100</div>
+    </div>
+  );
+}
+
 interface MetricsChartProps {
   result: AnalysisResult;
 }
@@ -21,15 +31,6 @@ export default function MetricsChart({ result }: MetricsChartProps) {
     { metric: mc.coherence,       score: result.coherenceScore },
   ];
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload?.length) return null;
-    return (
-      <div className="bg-bg-raised border border-bg-border rounded-lg px-3 py-2 shadow-xl">
-        <div className="text-[11px] text-ink-tertiary">{payload[0].payload.metric}</div>
-        <div className="num text-[18px] font-bold text-brand">{payload[0].value} / 100</div>
-      </div>
-    );
-  };
 
   return (
     <div className="h-52">

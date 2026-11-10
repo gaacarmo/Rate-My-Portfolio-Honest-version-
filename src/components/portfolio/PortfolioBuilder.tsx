@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useId } from "react";
 import { PortfolioAsset, AssetDefinition } from "@/types";
 import { searchAssets } from "@/data/assets";
 import Button from "@/components/ui/Button";
@@ -11,6 +11,7 @@ import { FolderOpen } from "lucide-react";
 interface PortfolioBuilderProps {
   assets: PortfolioAsset[];
   onChange: (assets: PortfolioAsset[]) => void;
+  onBrowsePresets?: () => void;
 }
 
 const CLASS_ABBR: Record<string, string> = {
@@ -33,26 +34,36 @@ function WeightInput({
   value,
   onCommit,
   className,
+  label,
 }: {
   value: number;
   onCommit: (n: number) => void;
   className?: string;
+  label: string;
 }) {
   const [raw, setRaw] = useState(String(value));
+  const [synced, setSynced] = useState(value);
 
   // Sync display when value changes from outside (e.g. auto-normalize)
-  useEffect(() => {
+  if (synced !== value) {
+    setSynced(value);
     setRaw(String(value));
-  }, [value]);
+  }
 
   return (
     <input
       type="number"
+      inputMode="decimal"
+      aria-label={label}
       min="0"
       max="100"
       step="0.1"
       value={raw}
       onChange={(e) => setRaw(e.target.value)}
+      onFocus={(e) => e.target.select()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") e.currentTarget.blur();
+      }}
       onBlur={() => {
         const n = parseFloat(raw);
         if (isNaN(n) || raw.trim() === "") {
@@ -66,12 +77,13 @@ function WeightInput({
   );
 }
 
-export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderProps) {
+export default function PortfolioBuilder({ assets, onChange, onBrowsePresets }: PortfolioBuilderProps) {
   const { t } = useLanguage();
   const b = t.builder;
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<AssetDefinition[]>([]);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+  const listId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -79,10 +91,11 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
   const isOver = total > 100.5;
   const isUnder = total < 99.5 && assets.length > 0;
 
-  useEffect(() => {
+  const results = useMemo(() => {
     const existing = new Set(assets.map((a) => a.ticker));
-    setResults(searchAssets(query).filter((r) => !existing.has(r.ticker)));
+    return searchAssets(query).filter((r) => !existing.has(r.ticker));
   }, [query, assets]);
+  const activeIndex = Math.min(active, Math.max(results.length - 1, 0));
 
   useEffect(() => {
     function close(e: MouseEvent) {
@@ -109,7 +122,24 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
       },
     ]);
     setQuery("");
+    setActive(0);
     setOpen(false);
+  }
+
+  function onSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setOpen(true);
+      setActive(Math.min(activeIndex + 1, results.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive(Math.max(activeIndex - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (open && results[activeIndex]) addAsset(results[activeIndex]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
   }
 
   function remove(id: string) {
@@ -130,15 +160,24 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
       {/* Search */}
       <div className="relative">
         <div className="relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-disabled" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-disabled" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+            onChange={(e) => { setQuery(e.target.value); setActive(0); setOpen(true); }}
             onFocus={() => setOpen(true)}
+            onKeyDown={onSearchKeyDown}
+            role="combobox"
+            aria-label={b.searchLabel}
+            aria-expanded={open && results.length > 0}
+            aria-controls={listId}
+            aria-autocomplete="list"
+            aria-activedescendant={open && results[activeIndex] ? `${listId}-${activeIndex}` : undefined}
+            autoComplete="off"
+            spellCheck={false}
             placeholder={b.searchPlaceholder}
             className="w-full pl-9 pr-4 py-2.5 bg-bg-raised border border-bg-border rounded-lg text-[13px] text-ink placeholder:text-ink-disabled focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/20 transition-all"
           />
@@ -147,14 +186,24 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
         {open && results.length > 0 && (
           <div
             ref={dropdownRef}
+            id={listId}
+            role="listbox"
             className="absolute top-full left-0 right-0 mt-1 bg-bg-raised border border-bg-border rounded-xl shadow-2xl z-50 overflow-hidden max-h-60 overflow-y-auto"
           >
-            {results.map((asset) => (
+            {results.map((asset, i) => (
               <button
                 key={asset.ticker}
+                id={`${listId}-${i}`}
+                role="option"
+                aria-selected={i === activeIndex}
                 type="button"
+                tabIndex={-1}
                 onClick={() => addAsset(asset)}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-overlay transition-colors text-left border-b border-bg-separator last:border-0"
+                onMouseEnter={() => setActive(i)}
+                className={clsx(
+                  "w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-b border-bg-separator last:border-0",
+                  i === activeIndex ? "bg-bg-overlay" : "hover:bg-bg-overlay"
+                )}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -170,6 +219,16 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
                 </svg>
               </button>
             ))}
+          </div>
+        )}
+
+        {open && query.trim() !== "" && results.length === 0 && (
+          <div
+            ref={dropdownRef}
+            role="status"
+            className="absolute top-full left-0 right-0 mt-1 bg-bg-raised border border-bg-border rounded-xl shadow-2xl z-50 px-4 py-3.5 text-[12px] text-ink-tertiary"
+          >
+            {b.noMatches(query.trim())}
           </div>
         )}
       </div>
@@ -204,6 +263,7 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
               <WeightInput
                 value={asset.weight}
                 onCommit={(n) => updateWeight(asset.id, n)}
+                label={b.weightFor(asset.ticker)}
                 className="num w-full text-right bg-bg-surface border border-bg-border rounded-lg px-2 sm:px-2.5 py-1.5 text-[13px] font-semibold text-ink focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/20 transition-all"
               />
 
@@ -211,6 +271,8 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
               <button
                 type="button"
                 onClick={() => remove(asset.id)}
+                aria-label={b.removeAsset(asset.ticker)}
+                title={b.removeAsset(asset.ticker)}
                 className="w-9 h-9 rounded-md flex items-center justify-center text-ink-disabled hover:text-danger hover:bg-danger-muted transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -253,7 +315,21 @@ export default function PortfolioBuilder({ assets, onChange }: PortfolioBuilderP
       {assets.length === 0 && (
         <div className="text-center py-14 space-y-2">
           <div className="flex justify-center"><FolderOpen className="w-8 h-8 text-ink-disabled" strokeWidth={1.5} /></div>
-          <p className="text-[13px] text-ink-disabled">{b.emptyMessage}</p>
+          <p className="text-[13px] text-ink-disabled">
+            {b.emptyMessage}{" "}
+            {onBrowsePresets ? (
+              <button
+                type="button"
+                onClick={onBrowsePresets}
+                className="text-ink-tertiary underline underline-offset-2 decoration-white/20 hover:text-brand hover:decoration-brand/50 transition-colors"
+              >
+                {b.emptyPresetLink}
+              </button>
+            ) : (
+              b.emptyPresetLink
+            )}
+            .
+          </p>
         </div>
       )}
     </div>

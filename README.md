@@ -2,15 +2,18 @@
 
 > Get a brutally honest analysis of your investment portfolio. Real metrics, real roasts. No sugarcoating.
 
-![Next.js](https://img.shields.io/badge/Next.js_14-black?logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js_16-black?logo=next.js)
+![React](https://img.shields.io/badge/React_19-149ECA?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-F97316)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
-A client-side web app that scores your investment portfolio across four dimensions, identifies weaknesses, and delivers contextual roasts calibrated to how bad things actually are. No backend, no database, no data collection.
+A client-side web app that scores your investment portfolio across four dimensions, identifies weaknesses, and delivers contextual roasts calibrated to how bad things actually are. No backend, no database, no data collection. English and Portuguese.
 
-**[Live demo →](https://ratemyportfolio.app)**
+**[Live demo →](https://rate-my-portfolio-honest-version.vercel.app)** · built by [Gabriel Carmo](https://gabrielcarmo.com)
+
+![Rate My Portfolio — a verdict card for a tech-heavy portfolio: grade C, "The Tech True Believer", followed by the roasts](docs/screenshot.jpg)
 
 ---
 
@@ -48,11 +51,12 @@ Beyond the score, you get warnings, recommendations, an alternative portfolio su
 
 ## Tech stack
 
-- **Next.js 14** App Router
+- **Next.js 16** App Router + **React 19**
 - **TypeScript** (strict mode)
 - **Tailwind CSS**
 - **Recharts** — allocation pie chart + metrics radar
 - **lucide-react** — icons
+- Deployed on **Vercel**
 
 100% client-side. No backend, no API keys required, no user data collected or stored.
 
@@ -60,10 +64,10 @@ Beyond the score, you get warnings, recommendations, an alternative portfolio su
 
 ## Getting started
 
-**Prerequisites:** Node.js 18+
+**Prerequisites:** Node.js 20+
 
 ```bash
-git clone https://github.com/gaacarmo/rate-my-portfolio.git
+git clone https://github.com/gaacarmo/Rate-My-Portfolio-Honest-version-.git rate-my-portfolio
 cd rate-my-portfolio
 npm install
 npm run dev
@@ -76,7 +80,7 @@ npm run build    # production build
 npm run lint     # run ESLint
 ```
 
-No environment variables are required to run the project locally.
+No environment variables are required. Optionally set `NEXT_PUBLIC_SITE_URL` to your own domain so canonical URLs, the sitemap and social previews point to it (defaults to the Vercel URL).
 
 ---
 
@@ -190,7 +194,7 @@ All UI strings are in `src/i18n/translations.ts`. If you're a native speaker of 
 
 Things that are planned but not yet built. Open an issue before starting work on any of these to avoid duplication:
 
-- [ ] not mocked assets, assets by API to include alL registered assets
+- [ ] Live asset data from a market API, so any listed ticker can be added
 - [ ] Share results via URL (encode portfolio in query params, no backend needed)
 - [ ] PDF export of the analysis
 - [ ] More languages (Spanish, French)
@@ -208,4 +212,4 @@ This tool is for entertainment and educational purposes only. Nothing here is fi
 
 ## License
 
-MIT — do what you want, attribution appreciated.
+[MIT](LICENSE) — do what you want, attribution appreciated.
